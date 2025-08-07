@@ -1,130 +1,185 @@
--- Report Bridge - Schema do Banco de Dados
--- Execute este script no SQL Editor do Supabase
+-- ===== SCHEMA DO SUPABASE - APENAS ADMIN =====
 
--- Criar tabela de relatórios
+-- Tabela de usuários estendida (apenas admin)
+CREATE TABLE IF NOT EXISTS users (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    auth_user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE UNIQUE,
+    name VARCHAR(255),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    role VARCHAR(20) DEFAULT 'admin' CHECK (role = 'admin'),
+    status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'suspended')),
+    last_login TIMESTAMP WITH TIME ZONE,
+    preferences JSONB DEFAULT '{}',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Tabela para tokens OAuth
+CREATE TABLE IF NOT EXISTS user_tokens (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    provider VARCHAR(50) NOT NULL,
+    access_token TEXT,
+    refresh_token TEXT,
+    expires_at TIMESTAMP WITH TIME ZONE,
+    scope TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id, provider)
+);
+
+-- Tabela para logs de atividade
+CREATE TABLE IF NOT EXISTS user_activity (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    action VARCHAR(100) NOT NULL,
+    details JSONB,
+    ip_address INET,
+    user_agent TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Tabela de relatórios
 CREATE TABLE IF NOT EXISTS reports (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    type VARCHAR(50) DEFAULT 'general' CHECK (type IN ('general', 'sales', 'financial', 'marketing', 'operations')),
-    data JSONB DEFAULT '{}',
-    status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'pending', 'completed', 'archived')),
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+    data JSONB,
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Criar índices para melhor performance
+-- Índices para performance
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
+CREATE INDEX IF NOT EXISTS idx_user_tokens_user_id ON user_tokens(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_tokens_provider ON user_tokens(provider);
+CREATE INDEX IF NOT EXISTS idx_user_activity_user_id ON user_activity(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_activity_created_at ON user_activity(created_at);
 CREATE INDEX IF NOT EXISTS idx_reports_user_id ON reports(user_id);
-CREATE INDEX IF NOT EXISTS idx_reports_type ON reports(type);
 CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status);
-CREATE INDEX IF NOT EXISTS idx_reports_created_at ON reports(created_at DESC);
 
--- Habilitar Row Level Security (RLS)
+-- Habilitar RLS
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_tokens ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_activity ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
 
--- Remover políticas existentes se houver
-DROP POLICY IF EXISTS "Users can view own reports" ON reports;
-DROP POLICY IF EXISTS "Users can create reports" ON reports;
-DROP POLICY IF EXISTS "Users can update own reports" ON reports;
-DROP POLICY IF EXISTS "Users can delete own reports" ON reports;
+-- Policies para users (apenas admin)
+CREATE POLICY "Admins can view all users" ON users
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE auth_user_id = auth.uid() AND role = 'admin'
+        )
+    );
 
--- Policy para usuários verem apenas seus próprios relatórios
-CREATE POLICY "Users can view own reports" ON reports
-    FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Admins can update all users" ON users
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE auth_user_id = auth.uid() AND role = 'admin'
+        )
+    );
 
--- Policy para usuários criarem relatórios
-CREATE POLICY "Users can create reports" ON reports
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Admins can insert users" ON users
+    FOR INSERT WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE auth_user_id = auth.uid() AND role = 'admin'
+        )
+    );
 
--- Policy para usuários atualizarem seus próprios relatórios
-CREATE POLICY "Users can update own reports" ON reports
-    FOR UPDATE USING (auth.uid() = user_id)
-    WITH CHECK (auth.uid() = user_id);
+-- Policies para user_tokens (apenas admin)
+CREATE POLICY "Admins can view all tokens" ON user_tokens
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE auth_user_id = auth.uid() AND role = 'admin'
+        )
+    );
 
--- Policy para usuários deletarem seus próprios relatórios
-CREATE POLICY "Users can delete own reports" ON reports
-    FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "Admins can manage all tokens" ON user_tokens
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE auth_user_id = auth.uid() AND role = 'admin'
+        )
+    );
 
--- Criar função para atualizar updated_at automaticamente
-CREATE OR REPLACE FUNCTION update_updated_at_column()
+-- Policies para user_activity (apenas admin)
+CREATE POLICY "Admins can view all activity" ON user_activity
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE auth_user_id = auth.uid() AND role = 'admin'
+        )
+    );
+
+CREATE POLICY "Admins can insert activity" ON user_activity
+    FOR INSERT WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE auth_user_id = auth.uid() AND role = 'admin'
+        )
+    );
+
+-- Policies para reports (apenas admin)
+CREATE POLICY "Admins can view all reports" ON reports
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE auth_user_id = auth.uid() AND role = 'admin'
+        )
+    );
+
+CREATE POLICY "Admins can manage all reports" ON reports
+    FOR ALL USING (
+        EXISTS (
+            SELECT 1 FROM users 
+            WHERE auth_user_id = auth.uid() AND role = 'admin'
+        )
+    );
+
+-- Função para criar usuário automaticamente (sempre admin)
+CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.updated_at = NOW();
+    INSERT INTO users (auth_user_id, name, email, role)
+    VALUES (
+        NEW.id,
+        COALESCE(NEW.raw_user_meta_data->>'name', NEW.email),
+        NEW.email,
+        'admin'
+    );
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Criar trigger para atualizar updated_at
-DROP TRIGGER IF EXISTS update_reports_updated_at ON reports;
-CREATE TRIGGER update_reports_updated_at
-    BEFORE UPDATE ON reports
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
-
--- Criar tabela de configurações do usuário (opcional)
-CREATE TABLE IF NOT EXISTS user_settings (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL UNIQUE,
-    theme VARCHAR(20) DEFAULT 'light' CHECK (theme IN ('light', 'dark')),
-    notifications BOOLEAN DEFAULT true,
-    language VARCHAR(5) DEFAULT 'pt-BR',
-    timezone VARCHAR(50) DEFAULT 'America/Sao_Paulo',
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Habilitar RLS para user_settings
-ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
-
--- Policies para user_settings
-CREATE POLICY "Users can view own settings" ON user_settings
-    FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "Users can insert own settings" ON user_settings
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update own settings" ON user_settings
-    FOR UPDATE USING (auth.uid() = user_id)
-    WITH CHECK (auth.uid() = user_id);
-
--- Trigger para user_settings
-CREATE TRIGGER update_user_settings_updated_at
-    BEFORE UPDATE ON user_settings
-    FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at_column();
-
--- Função para criar configurações padrão quando um usuário se registra
-CREATE OR REPLACE FUNCTION create_user_settings()
-RETURNS TRIGGER AS $$
-BEGIN
-    INSERT INTO user_settings (user_id)
-    VALUES (NEW.id);
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
-
--- Trigger para criar configurações automáticas
-DROP TRIGGER IF EXISTS create_user_settings_trigger ON auth.users;
-CREATE TRIGGER create_user_settings_trigger
+-- Trigger para criar usuário automaticamente
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
-    FOR EACH ROW
-    EXECUTE FUNCTION create_user_settings();
+    FOR EACH ROW EXECUTE FUNCTION handle_new_user();
 
--- Inserir dados de exemplo (opcional - remova em produção)
--- INSERT INTO reports (title, description, type, user_id) VALUES
--- ('Relatório de Vendas Q1', 'Análise das vendas do primeiro trimestre', 'sales', auth.uid()),
--- ('Relatório Financeiro Março', 'Resumo financeiro do mês de março', 'financial', auth.uid()),
--- ('Campanha Marketing Digital', 'Resultados da campanha no Google Ads', 'marketing', auth.uid());
+-- Função para atualizar last_login
+CREATE OR REPLACE FUNCTION update_last_login()
+RETURNS TRIGGER AS $$
+BEGIN
+    UPDATE users 
+    SET last_login = NOW()
+    WHERE auth_user_id = NEW.id;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Comentários para documentação
-COMMENT ON TABLE reports IS 'Tabela principal para armazenar relatórios dos usuários';
-COMMENT ON COLUMN reports.type IS 'Tipo do relatório: general, sales, financial, marketing, operations';
-COMMENT ON COLUMN reports.status IS 'Status do relatório: draft, pending, completed, archived';
-COMMENT ON COLUMN reports.data IS 'Dados adicionais do relatório em formato JSON';
-
-COMMENT ON TABLE user_settings IS 'Configurações personalizadas de cada usuário';
-
--- Mostrar mensagem de sucesso
-SELECT 'Schema do Report Bridge criado com sucesso! 🚀' as message;
+-- Trigger para atualizar last_login
+DROP TRIGGER IF EXISTS on_auth_user_login ON auth.users;
+CREATE TRIGGER on_auth_user_login
+    AFTER UPDATE ON auth.users
+    FOR EACH ROW 
+    WHEN (OLD.last_sign_in_at IS DISTINCT FROM NEW.last_sign_in_at)
+    EXECUTE FUNCTION update_last_login();
 

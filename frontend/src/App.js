@@ -4,6 +4,7 @@ import { useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Reports from './pages/Reports';
+import Users from './pages/Users';
 import Layout from './components/Layout';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -32,6 +33,7 @@ function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="reports" element={<Reports />} />
+          <Route path="users" element={<Users />} />
         </Route>
       </Route>
       

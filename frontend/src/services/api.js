@@ -88,5 +88,23 @@ export const gotoAPI = {
     api.get('/auth/goto/oauth'),
 };
 
+// API de usuários (apenas admin)
+export const usersAPI = {
+  getAll: () =>
+    api.get('/users/admin/users'),
+
+  getStats: () =>
+    api.get('/users/admin/stats'),
+
+  getProfile: () =>
+    api.get('/users/profile'),
+
+  updateProfile: (data) =>
+    api.put('/users/profile', data),
+
+  syncUser: (userId) =>
+    api.post(`/users/admin/users/${userId}/sync-goto`),
+};
+
 export default api;
 

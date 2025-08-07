@@ -12,7 +12,39 @@ const GOTO_CONFIG = {
   redirectUri: process.env.GOTO_REDIRECT_URI || 'http://localhost:3001/api/auth/goto/callback',
   authUrl: 'https://authentication.logmeininc.com/oauth/authorize',
   tokenUrl: 'https://authentication.logmeininc.com/oauth/token',
-  scope: 'read write'
+  scope: [
+    'openid',
+    'profile',
+    'voice-admin.v1.write',
+    'voicemail.v1.voicemails.write',
+    'call-history.v1.notifications.manage',
+    'call-control.v1.calls.control',
+    'voice-admin.v1.read',
+    'fax.v1.notifications.manage',
+    'call-events.v1.events.read',
+    'messaging.v1.read',
+    'webrtc.v1.write',
+    'voicemail.v1.voicemails.read',
+    'contacts.v1.write',
+    'presence.v1.notifications.manage',
+    'messaging.v1.write',
+    'recording.v1.notifications.manage',
+    'calls.v2.initiate',
+    'voicemail.v1.notifications.manage',
+    'messaging.v1.send',
+    'fax.v1.read',
+    'messaging.v1.notifications.manage',
+    'presence.v1.write',
+    'webrtc.v1.read',
+    'contacts.v1.read',
+    'fax.v1.write',
+    'recording.v1.read',
+    'call-events.v1.notifications.manage',
+    'presence.v1.read',
+    'cr.v1.read',
+    'users.v1.lines.read',
+    'users.v1.read'
+  ].join(' ')
 };
 
 // Login via GoTo/Email
