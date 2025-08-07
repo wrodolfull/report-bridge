@@ -1,0 +1,32 @@
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-left: 60px; /* Ajustado para sidebar mais fina */
+  margin-top: 64px; /* Compensar o header fixo */
+}
+
+.content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    margin-top: 64px;
+  }
+  
+  .content {
+    padding: 16px;
+  }
+}
+

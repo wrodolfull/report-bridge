@@ -1,0 +1,259 @@
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 64px;
+  background-color: white;
+  border-bottom: 1px solid #e1e5e9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+
+
+.search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  color: #999;
+}
+
+.search-input {
+  padding: 10px 12px 10px 40px;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+  font-size: 14px;
+  width: 300px;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #007bff;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* GoTo Connection Button */
+.goto-connect-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  position: relative;
+}
+
+.goto-connect-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #007bff;
+}
+
+.goto-connect-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.goto-connect-btn.connected {
+  background-color: #d4edda;
+  border-color: #28a745;
+  color: #155724;
+}
+
+.goto-connect-btn.connected:hover {
+  background-color: #c3e6cb;
+}
+
+.goto-logo {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+.goto-text {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: 4px;
+}
+
+.status-indicator.connected {
+  background-color: #28a745;
+  box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.2);
+}
+
+.status-indicator.disconnected {
+  background-color: #dc3545;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
+}
+
+.goto-connect-btn.loading .goto-text {
+  opacity: 0.7;
+}
+
+.goto-connect-btn.loading .status-indicator {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.notification-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.2s ease;
+}
+
+.notification-btn:hover {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 18px;
+  height: 18px;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.user-menu:hover {
+  background-color: #f5f5f5;
+}
+
+.user-avatar-header {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-name-header {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .header {
+    padding: 0 16px;
+  }
+  
+  .search-input {
+    width: 200px;
+  }
+  
+  .user-name-header {
+    display: none;
+  }
+  
+  .goto-connect-btn {
+    padding: 6px 12px;
+  }
+  
+  .goto-text {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .search-container {
+    display: none;
+  }
+  
+  .header-left {
+    gap: 12px;
+  }
+  
+  .header-right {
+    gap: 12px;
+  }
+}
+
