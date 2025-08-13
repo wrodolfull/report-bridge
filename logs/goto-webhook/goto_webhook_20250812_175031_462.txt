@@ -1,0 +1,21 @@
+=== GoTo Webhook Request ===
+Timestamp: 2025-08-12T17:50:31.462Z
+Client IP: 23.239.242.102
+Method: POST
+URL: /api/goto/webhook
+
+--- Headers ---
+{
+  "connection": "upgrade",
+  "host": "mysbc.pro",
+  "x-real-ip": "23.239.242.102",
+  "x-forwarded-for": "23.239.242.102",
+  "x-forwarded-proto": "https",
+  "content-length": "185",
+  "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+  "user-agent": "Apache-HttpClient/4.5.14 (Java/21.0.4)",
+  "accept-encoding": "gzip,deflate"
+}
+
+--- Body ---
+PBX_ID=1f1f030d-e3c5-4eb5-8c68-2f27bb1f56fe&CALL_ID=70f73b5f-399b9ffc-70cbc-7fd119dcc200-a46410ac-8fa-764&DIALED_NUMBER=%2B551150391047&CALLER_ID_NUMBER=%2B5519982714339&CALLER_ID_NAME=

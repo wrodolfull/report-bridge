@@ -88,5 +88,19 @@ export const gotoAPI = {
     api.get('/auth/goto/oauth'),
 };
 
+// API de Test Menu
+export const testMenuAPI = {
+  getRamal: () => api.get('/testmenu/ramal'),
+  getMe: () => api.get('/testmenu/me'),
+  getExtensions: () => api.get('/testmenu/extensions'),
+  getPresenceMe: () => api.get('/testmenu/presence/me'),
+  getPresenceSubscriptions: () => api.get('/testmenu/presence/subscriptions'),
+  getCallQueues: (accountKey) => api.get('/testmenu/call-queues', { params: accountKey ? { accountKey } : {} }),
+  getCallQueueUsers: (callQueueId, accountKey) => api.get(`/testmenu/call-queues/${callQueueId}/users`, { params: accountKey ? { accountKey } : {} }),
+  getCallQueueUserDetail: (callQueueId, userKey, accountKey) => api.get(`/testmenu/call-queues/${callQueueId}/users/${userKey}`, { params: accountKey ? { accountKey } : {} }),
+  getCallQueueDetail: (callQueueId, accountKey) => api.get(`/testmenu/call-queues/${callQueueId}/detail`, { params: accountKey ? { accountKey } : {} }),
+  getCallQueueLive: (callQueueId, accountKey) => api.get(`/testmenu/call-queues/${callQueueId}/live`, { params: accountKey ? { accountKey } : {} }),
+};
+
 export default api;
 

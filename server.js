@@ -6,6 +6,9 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
 const reportRoutes = require('./routes/reports');
+const testMenuRoutes = require('./routes/testMenu');
+const gotoCallEventsRoutes = require('./routes/gotoCallEvents');
+const gotoWebhookRoutes = require('./routes/gotoWebhook');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -27,13 +30,19 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Body parsing middleware
+// Webhook da GoTo precisa do corpo bruto para logging/validação de assinatura
+app.use('/api/goto/webhook', express.raw({ type: '*/*', limit: '10mb' }));
+
+// Body parsing middleware (após o raw do webhook)
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/testmenu', testMenuRoutes);
+app.use('/api/goto-call-events', gotoCallEventsRoutes);
+app.use('/api/goto/webhook', gotoWebhookRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

@@ -1,0 +1,25 @@
+=== GoTo Webhook Request (GET) ===
+Timestamp: 2025-08-12T17:49:29.714Z
+Client IP: 179.193.106.129
+Method: GET
+URL: /api/goto/webhook?test=123
+
+--- Headers ---
+{
+  "connection": "upgrade",
+  "host": "mysbc.pro",
+  "x-real-ip": "179.193.106.129",
+  "x-forwarded-for": "179.193.106.129",
+  "x-forwarded-proto": "https",
+  "content-type": "application/json",
+  "x-test": "123",
+  "user-agent": "PostmanRuntime/7.45.0",
+  "accept": "*/*",
+  "postman-token": "29171404-2720-4fbd-bcd0-bda3e6430f57",
+  "accept-encoding": "gzip, deflate, br"
+}
+
+--- Parameters (req.query) ---
+{
+  "test": "123"
+}

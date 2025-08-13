@@ -7,7 +7,8 @@ import {
   Settings, 
   LogOut, 
   BarChart3,
-  Users
+  Users,
+  Phone
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import './Sidebar.css';
@@ -38,6 +39,30 @@ const Sidebar = ({ collapsed }) => {
       icon: FileText,
       label: 'Relatórios',
       description: 'Gerenciar relatórios'
+    },
+    {
+      path: '/testmenu',
+      icon: Settings,
+      label: 'Test Menu',
+      description: 'Testes de integração GoTo'
+    },
+    {
+      path: '/presence',
+      icon: Settings,
+      label: 'Presence',
+      description: 'Dados de presença (GoTo)'
+    },
+    {
+      path: '/call-queues',
+      icon: Settings,
+      label: 'Call Queues',
+      description: 'Filas de atendimento (GoTo)'
+    },
+    {
+      path: '/goto-call-events',
+      icon: Phone,
+      label: 'Call Events',
+      description: 'Relatórios de eventos de chamadas (GoTo)'
     },
     {
       path: '/analytics',

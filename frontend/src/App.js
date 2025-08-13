@@ -4,7 +4,11 @@ import { useAuth } from './contexts/AuthContext';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Reports from './pages/Reports';
+import TestMenu from './pages/TestMenu';
+import Presence from './pages/Presence';
 import Layout from './components/Layout';
+import CallQueues from './pages/CallQueues';
+import GotoCallEvents from './pages/GotoCallEvents';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -32,6 +36,10 @@ function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="reports" element={<Reports />} />
+          <Route path="testmenu" element={<TestMenu />} />
+          <Route path="call-queues" element={<CallQueues />} />
+          <Route path="goto-call-events" element={<GotoCallEvents />} />
+          <Route path="presence" element={<Presence />} />
         </Route>
       </Route>
       
